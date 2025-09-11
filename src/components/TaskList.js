@@ -207,83 +207,198 @@ export default function TaskList() {
                 marginBottom: '10px',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1 }}>
-                    <h4 style={{ 
-                      margin: '0 0 5px 0', 
-                      color: '#212529',
-                      textDecoration: task.status === 'Completed' ? 'line-through' : 'none',
-                      opacity: task.status === 'Completed' ? 0.7 : 1
-                    }}>
-                      {task.title}
-                    </h4>
-                    
-                    {task.description && (
-                      <p style={{ 
-                        margin: '0 0 10px 0', 
-                        color: '#6c757d',
+                {editingTask === task._id ? (
+                  // โหมดแก้ไข
+                  <div>
+                    <input
+                      type="text"
+                      value={editForm.title}
+                      onChange={(e) => setEditForm({...editForm, title: e.target.value})}
+                      placeholder="ชื่องาน"
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        marginBottom: '10px',
+                        border: '1px solid #ced4da',
+                        borderRadius: '4px',
                         fontSize: '14px'
-                      }}>
-                        {task.description}
-                      </p>
-                    )}
+                      }}
+                    />
                     
-                    <div style={{ fontSize: '12px', color: '#6c757d' }}>
-                      <span>📅 ครบกำหนด: {formatDate(task.dueDate)}</span>
-                      <span style={{ marginLeft: '15px' }}>
-                        📝 สร้างเมื่อ: {formatDate(task.createdAt)}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div style={{ marginLeft: '15px', textAlign: 'right' }}>
-                    <div style={{
-                      backgroundColor: getStatusColor(task.status),
-                      color: 'white',
-                      padding: '4px 8px',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                      marginBottom: '10px',
-                      display: 'inline-block'
-                    }}>
-                      {getStatusText(task.status)}
+                    <textarea
+                      value={editForm.description}
+                      onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                      placeholder="รายละเอียด"
+                      rows={2}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        marginBottom: '10px',
+                        border: '1px solid #ced4da',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        resize: 'vertical'
+                      }}
+                    />
+                    
+                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                      <input
+                        type="date"
+                        value={editForm.dueDate}
+                        onChange={(e) => setEditForm({...editForm, dueDate: e.target.value})}
+                        style={{
+                          padding: '8px',
+                          border: '1px solid #ced4da',
+                          borderRadius: '4px',
+                          fontSize: '14px'
+                        }}
+                      />
+                      
+                      <select
+                        value={editForm.status}
+                        onChange={(e) => setEditForm({...editForm, status: e.target.value})}
+                        style={{
+                          padding: '8px',
+                          border: '1px solid #ced4da',
+                          borderRadius: '4px',
+                          fontSize: '14px'
+                        }}
+                      >
+                        <option value="Pending">รอดำเนินการ</option>
+                        <option value="In Progress">กำลังทำ</option>
+                        <option value="Completed">เสร็จแล้ว</option>
+                      </select>
                     </div>
                     
                     <div>
-                      <button 
-                        onClick={() => updateTaskStatus(task._id, getNextStatus(task.status))}
+                      <button
+                        onClick={saveEdit}
                         style={{
                           backgroundColor: '#28a745',
                           color: 'white',
                           border: 'none',
-                          padding: '5px 10px',
+                          padding: '8px 15px',
                           borderRadius: '4px',
                           cursor: 'pointer',
                           fontSize: '12px',
-                          marginRight: '5px'
+                          marginRight: '8px'
                         }}
                       >
-                        {task.status === 'Completed' ? '🔄 รีเซ็ต' : 
-                         task.status === 'In Progress' ? '✅ เสร็จ' : '▶️ เริ่ม'}
+                        💾 บันทึก
                       </button>
                       
-                      <button 
-                        onClick={() => deleteTask(task._id)}
+                      <button
+                        onClick={cancelEdit}
                         style={{
-                          backgroundColor: '#dc3545',
+                          backgroundColor: '#6c757d',
                           color: 'white',
                           border: 'none',
-                          padding: '5px 10px',
+                          padding: '8px 15px',
                           borderRadius: '4px',
                           cursor: 'pointer',
                           fontSize: '12px'
                         }}
                       >
-                        🗑️ ลบ
+                        ❌ ยกเลิก
                       </button>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  // โหมดแสดงปกติ
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ 
+                        margin: '0 0 5px 0', 
+                        color: '#212529',
+                        textDecoration: task.status === 'Completed' ? 'line-through' : 'none',
+                        opacity: task.status === 'Completed' ? 0.7 : 1
+                      }}>
+                        {task.title}
+                      </h4>
+                      
+                      {task.description && (
+                        <p style={{ 
+                          margin: '0 0 10px 0', 
+                          color: '#6c757d',
+                          fontSize: '14px'
+                        }}>
+                          {task.description}
+                        </p>
+                      )}
+                      
+                      <div style={{ fontSize: '12px', color: '#6c757d' }}>
+                        <span>📅 ครบกำหนด: {formatDate(task.dueDate)}</span>
+                        <span style={{ marginLeft: '15px' }}>
+                          📝 สร้างเมื่อ: {formatDate(task.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div style={{ marginLeft: '15px', textAlign: 'right' }}>
+                      <div style={{
+                        backgroundColor: getStatusColor(task.status),
+                        color: 'white',
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        marginBottom: '10px',
+                        display: 'inline-block'
+                      }}>
+                        {getStatusText(task.status)}
+                      </div>
+                      
+                      <div>
+                        <button 
+                          onClick={() => updateTaskStatus(task._id, getNextStatus(task.status))}
+                          style={{
+                            backgroundColor: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            padding: '5px 10px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            marginRight: '5px'
+                          }}
+                        >
+                          {task.status === 'Completed' ? '🔄 รีเซ็ต' : 
+                           task.status === 'In Progress' ? '✅ เสร็จ' : '▶️ เริ่ม'}
+                        </button>
+                        
+                        <button 
+                          onClick={() => startEdit(task)}
+                          style={{
+                            backgroundColor: '#ffc107',
+                            color: 'white',
+                            border: 'none',
+                            padding: '5px 10px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            marginRight: '5px'
+                          }}
+                        >
+                          ✏️ แก้ไข
+                        </button>
+                        
+                        <button 
+                          onClick={() => deleteTask(task._id)}
+                          style={{
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            padding: '5px 10px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '12px'
+                          }}
+                        >
+                          🗑️ ลบ
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
