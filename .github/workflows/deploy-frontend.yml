@@ -1,1 +1,36 @@
+name: Deploy Frontend to Render
 
+on:
+  push:
+    branches:
+      - main   # ทำงานเมื่อ push ไป branch main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ดึงโค้ดจาก GitHub
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # ติดตั้ง Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # ติดตั้ง dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # สร้าง build ของ React
+      - name: Build project
+        run: npm run build
+
+      # Deploy ไป Render
+      - name: Deploy to Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_FRONTEND_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
