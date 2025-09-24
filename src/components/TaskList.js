@@ -206,7 +206,7 @@ export default function TaskList() {
         <button 
           onClick={addTask}
           style={{
-            backgroundColor: '#a608e4ff',
+            backgroundColor: '#c026feff',
             color: 'white',
             border: 'none',
             padding: '10px 20px',
@@ -215,8 +215,8 @@ export default function TaskList() {
             fontSize: '14px',
             display: 'block'
           }}
-          onMouseOver={(e) => e.target.style.backgroundColor = '#ba0cffff'}
-          onMouseOut={(e) => e.target.style.backgroundColor = '#a608e4ff'}
+          onMouseOver={(e) => e.target.style.backgroundColor = '#ce5ffbff'}
+          onMouseOut={(e) => e.target.style.backgroundColor = '#ce5ffbff'}
         >
           ➕ เพิ่มงาน
         </button>
@@ -387,7 +387,7 @@ export default function TaskList() {
                         <button 
                           onClick={() => updateTaskStatus(task._id, getNextStatus(task.status))}
                           style={{
-                            backgroundColor: '#a608e4ff',
+                            backgroundColor: '#c026feff',
                             color: 'white',
                             border: 'none',
                             padding: '5px 10px',
@@ -404,7 +404,7 @@ export default function TaskList() {
                         <button 
                           onClick={() => startEdit(task)}
                           style={{
-                            backgroundColor: '#a608e4ff',
+                            backgroundColor: '#c026feff',
                             color: 'white',
                             border: 'none',
                             padding: '5px 10px',
@@ -420,7 +420,7 @@ export default function TaskList() {
                         <button 
                           onClick={() => deleteTask(task._id)}
                           style={{
-                            backgroundColor: '#a608e4ff',
+                            backgroundColor: '#c026feff',
                             color: 'white',
                             border: 'none',
                             padding: '5px 10px',
