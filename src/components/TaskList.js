@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from "../api";
 
-export default function TaskList() {
+export default function TaskList({ userId }) {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({
     title: "",
@@ -10,7 +10,6 @@ export default function TaskList() {
   });
   const [loading, setLoading] = useState(false);
 
-  // 👇 state สำหรับแก้ไข
   const [editingTask, setEditingTask] = useState(null);
   const [editForm, setEditForm] = useState({
     title: "",
@@ -19,15 +18,15 @@ export default function TaskList() {
     status: "Pending"
   });
 
-  // โหลดงานทั้งหมด
+  // โหลดงานของ user นี้
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (userId) fetchTasks();
+  }, [userId]);
 
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const res = await API.get("/tasks");
+      const res = await API.get(`/tasks?user=${userId}`);
       setTasks(res.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -47,7 +46,8 @@ export default function TaskList() {
       const taskData = {
         title: newTask.title,
         description: newTask.description,
-        ...(newTask.dueDate && { dueDate: newTask.dueDate })
+        ...(newTask.dueDate && { dueDate: newTask.dueDate }),
+        user: userId   // ✅ ผูกกับ user
       };
 
       await API.post("/tasks", taskData);
@@ -73,7 +73,7 @@ export default function TaskList() {
 
   const updateTaskStatus = async (id, newStatus) => {
     try {
-      await API.put(`/tasks/${id}`, { status: newStatus });
+      await API.put(`/tasks/${id}`, { status: newStatus, user: userId });
       fetchTasks();
     } catch (error) {
       console.error("Error updating task status:", error);
@@ -81,7 +81,6 @@ export default function TaskList() {
     }
   };
 
-  // 👇 ฟังก์ชันจัดการแก้ไข
   const startEdit = (task) => {
     setEditingTask(task._id);
     setEditForm({
@@ -99,7 +98,7 @@ export default function TaskList() {
 
   const saveEdit = async () => {
     try {
-      await API.put(`/tasks/${editingTask}`, editForm);
+      await API.put(`/tasks/${editingTask}`, { ...editForm, user: userId });
       setEditingTask(null);
       fetchTasks();
     } catch (error) {
@@ -110,38 +109,42 @@ export default function TaskList() {
 
   const formatDate = (dateString) => {
     if (!dateString) return "—";
-    return new Date(dateString).toLocaleDateString('th-TH');
+    return new Date(dateString).toLocaleDateString("th-TH");
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Pending': return '#ff1500ff';
-      case 'In Progress': return '#ffb700ff';
-      case 'Completed': return '#28a745';
-      default: return '#6c757d';
+      case "Pending": return "#ff1500ff";
+      case "In Progress": return "#ffb700ff";
+      case "Completed": return "#28a745";
+      default: return "#6c757d";
     }
   };
 
   const getNextStatus = (currentStatus) => {
     switch (currentStatus) {
-      case 'Pending': return 'In Progress';
-      case 'In Progress': return 'Completed';
-      case 'Completed': return 'Pending';
-      default: return 'Pending';
+      case "Pending": return "In Progress";
+      case "In Progress": return "Completed";
+      case "Completed": return "Pending";
+      default: return "Pending";
     }
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'Pending': return 'รอดำเนินการ';
-      case 'In Progress': return 'กำลังทำ';
-      case 'Completed': return 'เสร็จแล้ว';
+      case "Pending": return "รอดำเนินการ";
+      case "In Progress": return "กำลังทำ";
+      case "Completed": return "เสร็จแล้ว";
       default: return status;
     }
   };
 
+  if (!userId) {
+    return <div style={{ textAlign: "center", padding: "20px" }}>❗ กรุณา Login ก่อน</div>;
+  }
+
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '20px' }}>🔄 กำลังโหลด...</div>;
+    return <div style={{ textAlign: "center", padding: "20px" }}>🔄 กำลังโหลด...</div>;
   }
 
   return (
