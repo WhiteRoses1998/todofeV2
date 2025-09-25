@@ -19,22 +19,23 @@ export default function TaskList({ userId }) {
   });
 
   // โหลดงานของ user นี้
-  useEffect(() => {
-    if (userId) fetchTasks();
-  }, [userId]);
+  const fetchTasks = useCallback(async () => {
+  try {
+    setLoading(true);
+    const res = await API.get(`/tasks?user=${userId}`);
+    setTasks(res.data);
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+  } finally {
+    setLoading(false);
+  }
+}, [userId]);
 
-  const fetchTasks = async () => {
-    try {
-      setLoading(true);
-      const res = await API.get(`/tasks?user=${userId}`);
-      setTasks(res.data);
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-      alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
-    } finally {
-      setLoading(false);
-    }
-  };
+useEffect(() => {
+  if (userId) fetchTasks();
+}, [userId, fetchTasks]);
+
 
   const addTask = async () => {
     if (!newTask.title.trim()) {
